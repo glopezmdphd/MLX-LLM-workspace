@@ -1,0 +1,20 @@
+# Python virtual environment
+venv/
+
+# Model directories (do not version control large binaries)
+models/original/
+models/quantized/
+models/exported/
+
+# Jupyter notebook checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code settings (optional, if you want to exclude)
+.vscode/
+
+# Data files (optional, if large or sensitive)
+data/
