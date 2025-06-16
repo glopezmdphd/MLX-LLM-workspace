@@ -1,11 +1,11 @@
-import os
 from pathlib import Path
 import sys
 
 try:
-    from mlx_lm import load, quantize, export  # Adjust as needed for your MLX version
-except ImportError:
+    from mlx_lm import load
+except ImportError as e:
     print("MLX is not installed. Please activate your venv and run 'pip install mlx-lm'.")
+    print("ImportError:", e)
     sys.exit(1)
 
 BASE_DIR = Path(__file__).parent.resolve()
@@ -28,67 +28,30 @@ def review_model():
 def download_model():
     model_name = input("Enter the model name to download (e.g., mlx-community/Meta-Llama-3-8B): ")
     print(f"\nDownloading model: {model_name}")
-    model, tokenizer = load(model_name)
+    try:
+        model, tokenizer = load(model_name)
+    except Exception as e:
+        print(f"Failed to download or load the model '{model_name}'.")
+        print(f"Error: {e}")
+        return
     save_path = MODEL_DIRS["original"] / model_name.replace("/", "_")
     save_path.mkdir(parents=True, exist_ok=True)
     if hasattr(model, "save_pretrained"):
-        model.save_pretrained(str(save_path))
-        print(f"Model saved to {save_path}")
+        try:
+            model.save_pretrained(str(save_path))
+            print(f"Model saved to {save_path}")
+        except Exception as e:
+            print(f"Model loaded but failed to save to disk: {e}")
     else:
         print("Model loaded in memory (saving to disk not supported by this MLX version).")
 
 def quantize_model():
-    model_name = input("Enter the model name to quantize (e.g., mlx-community/Meta-Llama-3-8B): ")
-    bits = input("Enter quantization bits (4 or 8): ")
-    try:
-        bits = int(bits)
-        if bits not in [4, 8]:
-            raise ValueError
-    except ValueError:
-        print("Invalid input. Please enter 4 or 8.")
-        return
-    print(f"\nQuantizing model: {model_name} to {bits}-bit")
-    model_path = MODEL_DIRS["original"] / model_name.replace("/", "_")
-    if not model_path.exists():
-        print(f"Original model not found at {model_path}. Please download first.")
-        return
-    try:
-        model, tokenizer = load(str(model_path))
-    except Exception:
-        model, tokenizer = load(model_name)
-    quantized_model = quantize(model, bits)
-    quant_path = MODEL_DIRS["quantized"] / f"{model_name.replace('/', '_')}_{bits}bit"
-    quant_path.mkdir(parents=True, exist_ok=True)
-    if hasattr(quantized_model, "save_pretrained"):
-        quantized_model.save_pretrained(str(quant_path))
-        print(f"Quantized model saved to {quant_path}")
-    else:
-        print("Quantized model in memory (saving to disk not supported by this MLX version).")
+    print("Quantization functionality is not available in the current mlx_lm API.")
+    print("Please refer to the MLX documentation for quantization support or update this script when the API is available.")
 
 def export_model():
-    model_name = input("Enter the model name to export (e.g., mlx-community/Meta-Llama-3-8B): ")
-    export_format = input("Enter export format (onnx or gguf): ").strip().lower()
-    bits = input("Enter quantization bits (4 or 8, or leave blank for original): ").strip()
-    bits = int(bits) if bits in ['4', '8'] else None
-    print(f"\nExporting model: {model_name} to format: {export_format}")
-    if bits:
-        quant_path = MODEL_DIRS["quantized"] / f"{model_name.replace('/', '_')}_{bits}bit"
-        if not quant_path.exists():
-            print(f"Quantized model not found at {quant_path}. Please quantize first.")
-            return
-        model, tokenizer = load(str(quant_path))
-    else:
-        model_path = MODEL_DIRS["original"] / model_name.replace("/", "_")
-        if not model_path.exists():
-            print(f"Original model not found at {model_path}. Please download first.")
-            return
-        model, tokenizer = load(str(model_path))
-    export_path = MODEL_DIRS["exported"] / f"{model_name.replace('/', '_')}.{export_format}"
-    if hasattr(model, "export"):
-        model.export(str(export_path), format=export_format)
-        print(f"Exported model saved to {export_path}")
-    else:
-        print("Export functionality not supported by this MLX version or model type.")
+    print("Export functionality is not available in the current mlx_lm API.")
+    print("Please refer to the MLX documentation for export support or update this script when the API is available.")
 
 def display_menu():
     print("\nMLX LLM Interactive Menu")
