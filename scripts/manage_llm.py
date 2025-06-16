@@ -57,8 +57,8 @@ def display_menu():
     print("\nMLX LLM Interactive Menu")
     print("1. Review a model")
     print("2. Download a model")
-    print("3. Quantize a model")
-    print("4. Export a model")
+    print("3. Quantize a model; NOTE WELL, USE CLI ")
+    print("4. Export a model: NOTE WELL, USE CLI")
     print("5. Exit")
 
 def main():
